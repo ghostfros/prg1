@@ -1,0 +1,169 @@
+
+8) Create an activity and load any fragment on it. Write all life cycle methods of fragment
+with toast messages or logs.
+
+MyFragment.java
+package com.example.fragmentlifecycle;
+
+import android.content.Context;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+public class MyFragment extends Fragment {
+
+    private static final String TAG = "FragmentLifecycle";
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        Toast.makeText(context, "Fragment onAttach", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "Fragment onAttach");
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Toast.makeText(getActivity(), "Fragment onCreate", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "Fragment onCreate");
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Toast.makeText(getActivity(), "Fragment onCreateView", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "Fragment onCreateView");
+        return inflater.inflate(R.layout.fragment_my, container, false);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Toast.makeText(getActivity(), "Fragment onActivityCreated", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "Fragment onActivityCreated");
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Toast.makeText(getActivity(), "Fragment onStart", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "Fragment onStart");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Toast.makeText(getActivity(), "Fragment onResume", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "Fragment onResume");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Toast.makeText(getActivity(), "Fragment onPause", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "Fragment onPause");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Toast.makeText(getActivity(), "Fragment onStop", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "Fragment onStop");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Toast.makeText(getActivity(), "Fragment onDestroyView", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "Fragment onDestroyView");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Toast.makeText(getActivity(), "Fragment onDestroy", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "Fragment onDestroy");
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Toast.makeText(getActivity(), "Fragment onDetach", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "Fragment onDetach");
+    }
+}
+
+
+MainActivity.java
+package com.example.fragmentlifecycle;
+
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // Display toast and log message in activity's onCreate
+        Toast.makeText(this, "Activity onCreate", Toast.LENGTH_SHORT).show();
+        Log.d("ActivityLifecycle", "Activity onCreate");
+
+        // Load fragment dynamically
+        loadFragment();
+    }
+
+    // Method to load the fragment
+    private void loadFragment() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        MyFragment fragment = new MyFragment();
+        fragmentTransaction.add(R.id.fragment_container, fragment);  // Replace R.id.fragment_container with your container's ID
+        fragmentTransaction.commit();
+    }
+}
+
+
+fragment_my.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <!-- Fragment's UI -->
+    <TextView
+        android:id="@+id/fragment_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="This is a Fragment"
+        android:textSize="18sp" />
+</LinearLayout>
+
+
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Container where the fragment will be loaded -->
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</FrameLayout>

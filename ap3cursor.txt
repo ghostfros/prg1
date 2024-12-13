@@ -1,0 +1,133 @@
+3) What is Curson? Demonstrate a SQLite database application to insert a record in table.
+
+SQLiteHelper.java
+package com.example.employeemanagement;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+public class SQLiteHelper extends SQLiteOpenHelper {
+
+    private static final String DATABASE_NAME = "EmployeeDB";
+    private static final int DATABASE_VERSION = 1;
+    private static final String TABLE_NAME = "Employee";
+    private static final String COLUMN_ID = "eid";
+    private static final String COLUMN_NAME = "ename";
+    private static final String COLUMN_DEPARTMENT = "edept";
+    private static final String COLUMN_SALARY = "esalary";
+
+    public SQLiteHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_NAME + " TEXT, " +
+                COLUMN_DEPARTMENT + " TEXT, " +
+                COLUMN_SALARY + " REAL);");
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        onCreate(db);
+    }
+
+    public void insertEmployee(String name, String department, double salary) {
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_NAME, name);
+        values.put(COLUMN_DEPARTMENT, department);
+        values.put(COLUMN_SALARY, salary);
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.insert(TABLE_NAME, null, values);
+    }
+
+    public Cursor getAllEmployees() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+    }
+}
+
+
+MainActivity.java
+package com.example.employeemanagement;
+
+import android.database.Cursor;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    SQLiteHelper dbHelper;
+    EditText enameEditText, edeptEditText, esalaryEditText;
+    Button insertButton, viewButton;
+    TextView employeeList;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        enameEditText = findViewById(R.id.ename);
+        edeptEditText = findViewById(R.id.edept);
+        esalaryEditText = findViewById(R.id.esalary);
+        insertButton = findViewById(R.id.insert_button);
+        viewButton = findViewById(R.id.view_button);
+        employeeList = findViewById(R.id.employee_list);
+
+        dbHelper = new SQLiteHelper(this);
+
+        insertButton.setOnClickListener(v -> {
+            String name = enameEditText.getText().toString();
+            String dept = edeptEditText.getText().toString();
+            String salaryStr = esalaryEditText.getText().toString();
+
+            if (!name.isEmpty() && !dept.isEmpty() && !salaryStr.isEmpty()) {
+                dbHelper.insertEmployee(name, dept, Double.parseDouble(salaryStr));
+                Toast.makeText(this, "Employee added", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Fill all fields", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        viewButton.setOnClickListener(v -> {
+            Cursor cursor = dbHelper.getAllEmployees();
+            StringBuilder sb = new StringBuilder();
+            while (cursor.moveToNext()) {
+                sb.append("ID: ").append(cursor.getInt(0))
+                  .append(", Name: ").append(cursor.getString(1))
+                  .append(", Department: ").append(cursor.getString(2))
+                  .append(", Salary: ").append(cursor.getDouble(3)).append("\n");
+            }
+            employeeList.setText(sb.toString());
+            cursor.close();
+        });
+    }
+}
+
+
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText android:id="@+id/ename" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Name" />
+    <EditText android:id="@+id/edept" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Department" />
+    <EditText android:id="@+id/esalary" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Salary" android:inputType="numberDecimal" />
+    <Button android:id="@+id/insert_button" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Insert Employee" />
+    <Button android:id="@+id/view_button" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="View Employees" />
+    <TextView android:id="@+id/employee_list" android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingTop="16dp" />
+</LinearLayout>

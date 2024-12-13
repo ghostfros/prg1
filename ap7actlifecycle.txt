@@ -1,0 +1,92 @@
+
+7) Create an activity and demonstrate life cycle of activity with toast messages or logs.
+
+MainActivity.java
+package com.example.activitylifecycle;
+
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    private static final String TAG = "ActivityLifecycle";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // Displaying a toast and log message when activity is created
+        Toast.makeText(this, "onCreate called", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "onCreate called");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Displaying a toast and log message when activity is started
+        Toast.makeText(this, "onStart called", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "onStart called");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Displaying a toast and log message when activity is resumed
+        Toast.makeText(this, "onResume called", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "onResume called");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Displaying a toast and log message when activity is paused
+        Toast.makeText(this, "onPause called", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "onPause called");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Displaying a toast and log message when activity is stopped
+        Toast.makeText(this, "onStop called", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "onStop called");
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        // Displaying a toast and log message when activity is restarted
+        Toast.makeText(this, "onRestart called", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "onRestart called");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Displaying a toast and log message when activity is destroyed
+        Toast.makeText(this, "onDestroy called", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "onDestroy called");
+    }
+}
+
+
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Simple TextView -->
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Activity Lifecycle Demo"
+        android:textSize="18sp" />
+</LinearLayout>

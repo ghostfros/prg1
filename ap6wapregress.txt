@@ -1,0 +1,201 @@
+6) WAP to demonstrate web services. Consider following information:
+Get request: https://reqres.in/api/users?page=2
+Use any library to make a get request and parse response into data model class and
+show it on the UI as you want.
+
+app/build.gradle
+dependencies {
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+}
+
+
+User.java
+package com.example.webservice;
+
+import com.google.gson.annotations.SerializedName;
+import java.util.List;
+
+public class UserResponse {
+
+    @SerializedName("page")
+    private int page;
+
+    @SerializedName("per_page")
+    private int perPage;
+
+    @SerializedName("total")
+    private int total;
+
+    @SerializedName("total_pages")
+    private int totalPages;
+
+    @SerializedName("data")
+    private List<User> users;
+
+    public int getPage() {
+        return page;
+    }
+
+    public int getPerPage() {
+        return perPage;
+    }
+
+    public int getTotal() {
+        return total;
+    }
+
+    public int getTotalPages() {
+        return totalPages;
+    }
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public static class User {
+        @SerializedName("id")
+        private int id;
+
+        @SerializedName("email")
+        private String email;
+
+        @SerializedName("first_name")
+        private String firstName;
+
+        @SerializedName("last_name")
+        private String lastName;
+
+        @SerializedName("avatar")
+        private String avatar;
+
+        public int getId() {
+            return id;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public String getFirstName() {
+            return firstName;
+        }
+
+        public String getLastName() {
+            return lastName;
+        }
+
+        public String getAvatar() {
+            return avatar;
+        }
+    }
+}
+
+
+ApiService.java
+package com.example.webservice;
+
+import retrofit2.Call;
+import retrofit2.http.GET;
+import retrofit2.http.Query;
+
+public interface ApiService {
+
+    @GET("api/users")
+    Call<UserResponse> getUsers(@Query("page") int page);
+}
+
+
+RetrofitClient.java
+package com.example.webservice;
+
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+public class RetrofitClient {
+
+    private static final String BASE_URL = "https://reqres.in/";
+
+    public static Retrofit getRetrofitInstance() {
+        return new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+    }
+}
+
+
+MainActivity.java
+package com.example.webservice;
+
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+import java.util.List;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class MainActivity extends AppCompatActivity {
+
+    private TextView resultTextView;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        resultTextView = findViewById(R.id.result_text_view);
+
+        // Call the API
+        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        Call<UserResponse> call = apiService.getUsers(2);
+
+        call.enqueue(new Callback<UserResponse>() {
+            @Override
+            public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
+                if (response.isSuccessful()) {
+                    List<UserResponse.User> users = response.body().getUsers();
+                    displayUsers(users);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserResponse> call, Throwable t) {
+                Log.e("MainActivity", "Error: " + t.getMessage());
+            }
+        });
+    }
+
+    private void displayUsers(List<UserResponse.User> users) {
+        StringBuilder sb = new StringBuilder();
+        for (UserResponse.User user : users) {
+            sb.append("ID: ").append(user.getId())
+              .append("\nName: ").append(user.getFirstName()).append(" ").append(user.getLastName())
+              .append("\nEmail: ").append(user.getEmail()).append("\n\n");
+        }
+        resultTextView.setText(sb.toString());
+    }
+}
+
+
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/result_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:padding="16dp" />
+</LinearLayout>
+
+
+AndroidManifest.xml
+<uses-permission android:name="android.permission.INTERNET"/>

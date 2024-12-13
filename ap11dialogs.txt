@@ -1,0 +1,169 @@
+11. Write a program to demonstrate different dialogs in android.
+
+MainActivity.java
+package com.example.dialogdemo;
+
+import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
+import android.app.TimePickerDialog;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.TimePicker;
+import android.widget.Toast;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.Calendar;
+
+public class MainActivity extends AppCompatActivity {
+
+    private Button alertDialogBtn, datePickerDialogBtn, timePickerDialogBtn, progressDialogBtn;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // Initialize buttons
+        alertDialogBtn = findViewById(R.id.alertDialogBtn);
+        datePickerDialogBtn = findViewById(R.id.datePickerDialogBtn);
+        timePickerDialogBtn = findViewById(R.id.timePickerDialogBtn);
+        progressDialogBtn = findViewById(R.id.progressDialogBtn);
+
+        // AlertDialog demonstration
+        alertDialogBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showAlertDialog();
+            }
+        });
+
+        // DatePickerDialog demonstration
+        datePickerDialogBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePickerDialog();
+            }
+        });
+
+        // TimePickerDialog demonstration
+        timePickerDialogBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showTimePickerDialog();
+            }
+        });
+
+        // ProgressDialog demonstration
+        progressDialogBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showProgressDialog();
+            }
+        });
+    }
+
+    // Method to show AlertDialog
+    private void showAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Alert Dialog")
+                .setMessage("Are you sure you want to proceed?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    Toast.makeText(MainActivity.this, "You clicked Yes", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+                    Toast.makeText(MainActivity.this, "You clicked No", Toast.LENGTH_SHORT).show();
+                })
+                .setNeutralButton("Cancel", (dialog, which) -> {
+                    Toast.makeText(MainActivity.this, "You clicked Cancel", Toast.LENGTH_SHORT).show();
+                })
+                .create()
+                .show();
+    }
+
+    // Method to show DatePickerDialog
+    private void showDatePickerDialog() {
+        // Get the current date
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
+                (view, selectedYear, selectedMonth, selectedDay) -> {
+                    String date = selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear;
+                    Toast.makeText(MainActivity.this, "Selected Date: " + date, Toast.LENGTH_SHORT).show();
+                }, year, month, day);
+
+        datePickerDialog.show();
+    }
+
+    // Method to show TimePickerDialog
+    private void showTimePickerDialog() {
+        // Get the current time
+        Calendar calendar = Calendar.getInstance();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+
+        TimePickerDialog timePickerDialog = new TimePickerDialog(this,
+                (view, hourOfDay, minute1) -> {
+                    String time = hourOfDay + ":" + minute1;
+                    Toast.makeText(MainActivity.this, "Selected Time: " + time, Toast.LENGTH_SHORT).show();
+                }, hour, minute, true);
+
+        timePickerDialog.show();
+    }
+
+    // Method to show ProgressDialog (Deprecated in modern APIs, but still usable)
+    private void showProgressDialog() {
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Loading...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        // Simulate a long-running operation with a delay
+        new android.os.Handler().postDelayed(() -> progressDialog.dismiss(), 3000);  // Dismiss after 3 seconds
+    }
+}
+
+
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp">
+
+    <Button
+        android:id="@+id/alertDialogBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show AlertDialog" />
+
+    <Button
+        android:id="@+id/datePickerDialogBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show DatePickerDialog"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/timePickerDialogBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show TimePickerDialog"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/progressDialogBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show ProgressDialog"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>

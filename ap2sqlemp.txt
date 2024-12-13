@@ -1,0 +1,163 @@
+2) Write an android application using SQLite to create employee (eid, ename, adept,
+esalary) table and insert a record in table and display appropriate message on toast to
+user.
+
+SQLiteHelper.java
+package com.example.employeemanagement;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.widget.Toast;
+
+public class SQLiteHelper extends SQLiteOpenHelper {
+
+    // Database and table details
+    private static final String DATABASE_NAME = "EmployeeDB";
+    private static final int DATABASE_VERSION = 1;
+    private static final String TABLE_NAME = "Employee";
+    private static final String COLUMN_ID = "eid";
+    private static final String COLUMN_NAME = "ename";
+    private static final String COLUMN_DEPARTMENT = "edept";
+    private static final String COLUMN_SALARY = "esalary";
+
+    private Context context;
+
+    // Constructor
+    public SQLiteHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.context = context;
+    }
+
+    // Create table
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        String createTableQuery = "CREATE TABLE " + TABLE_NAME + " ("
+                + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + COLUMN_NAME + " TEXT, "
+                + COLUMN_DEPARTMENT + " TEXT, "
+                + COLUMN_SALARY + " DOUBLE);";
+        db.execSQL(createTableQuery);
+    }
+
+    // Drop table if it exists and recreate it
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        onCreate(db);
+    }
+
+    // Insert employee record into database
+    public void insertEmployee(String name, String department, double salary) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_NAME, name);
+        values.put(COLUMN_DEPARTMENT, department);
+        values.put(COLUMN_SALARY, salary);
+
+        // Insert row and check if the insertion is successful
+        long result = db.insert(TABLE_NAME, null, values);
+
+        if (result == -1) {
+            Toast.makeText(context, "Failed to insert record", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(context, "Record inserted successfully", Toast.LENGTH_SHORT).show();
+        }
+    }
+}
+
+
+MainActivity.java
+package com.example.employeemanagement;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    SQLiteHelper dbHelper;
+    EditText enameEditText, edeptEditText, esalaryEditText;
+    Button insertButton;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // Initialize UI elements
+        enameEditText = findViewById(R.id.ename);
+        edeptEditText = findViewById(R.id.edept);
+        esalaryEditText = findViewById(R.id.esalary);
+        insertButton = findViewById(R.id.insert_button);
+
+        // Initialize SQLiteHelper
+        dbHelper = new SQLiteHelper(this);
+
+        // Set click listener for the insert button
+        insertButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Get user input
+                String ename = enameEditText.getText().toString();
+                String edept = edeptEditText.getText().toString();
+                String esalaryStr = esalaryEditText.getText().toString();
+
+                // Check if inputs are valid
+                if (ename.isEmpty() || edept.isEmpty() || esalaryStr.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+                } else {
+                    double esalary = Double.parseDouble(esalaryStr);
+                    // Insert record in the database
+                    dbHelper.insertEmployee(ename, edept, esalary);
+                }
+            }
+        });
+    }
+}
+
+
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Employee Name -->
+    <EditText
+        android:id="@+id/ename"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Employee Name"
+        android:inputType="text" />
+
+    <!-- Employee Department -->
+    <EditText
+        android:id="@+id/edept"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Department"
+        android:inputType="text" />
+
+    <!-- Employee Salary -->
+    <EditText
+        android:id="@+id/esalary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Salary"
+        android:inputType="numberDecimal" />
+
+    <!-- Insert Button -->
+    <Button
+        android:id="@+id/insert_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Insert Employee" />
+
+</LinearLayout>
